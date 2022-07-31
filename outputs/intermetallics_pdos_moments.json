@@ -1,0 +1,487 @@
+{
+    "623c42070f940d8798ed570b": {
+        "d_band_centre": -1.5907444315133406,
+        "d_band_width": 0.5146027005253488,
+        "metal_solute": "Rh"
+    },
+    "623d0e850f940d87984c188b": {
+        "d_band_centre": -1.3701151219000987,
+        "d_band_width": 0.4301570911717922,
+        "metal_solute": "Rh"
+    },
+    "6298b8d2905366c47b0d0f2e": {
+        "d_band_centre": -0.7994217535721624,
+        "d_band_width": 0.21529278580269925,
+        "metal_solute": "Rh"
+    },
+    "623b37480f940d8798616fd9": {
+        "d_band_centre": -1.3787969796971227,
+        "d_band_width": 0.44832017832468196,
+        "metal_solute": "Ir"
+    },
+    "623b58ab0f940d8798701fff": {
+        "d_band_centre": -1.61729226678484,
+        "d_band_width": 1.6510545141569313,
+        "metal_solute": "Ir"
+    },
+    "62989778905366c47bfaaf07": {
+        "d_band_centre": -1.6865296168343487,
+        "d_band_width": 0.48582651478968125,
+        "metal_solute": "Ir"
+    },
+    "6298cdb4905366c47b188a20": {
+        "d_band_centre": -1.0817517827253127,
+        "d_band_width": 0.30854118445037654,
+        "metal_solute": "Ir"
+    },
+    "6298e2e2905366c47b2400f4": {
+        "d_band_centre": -1.5728088701165914,
+        "d_band_width": 0.6044018332284355,
+        "metal_solute": "Ir"
+    },
+    "623cb56a0f940d8798228647": {
+        "d_band_centre": -3.2734924222572936,
+        "d_band_width": 0.437528554671283,
+        "metal_solute": "Pd"
+    },
+    "623c280f0f940d8798e0bb7b": {
+        "d_band_centre": -0.9630518598206804,
+        "d_band_width": 0.11666847886047456,
+        "metal_solute": "Pd"
+    },
+    "623ca7650f940d87981bf6f7": {
+        "d_band_centre": -1.9622524348787616,
+        "d_band_width": 0.10368741158005568,
+        "metal_solute": "Pd"
+    },
+    "623c54290f940d8798f598c2": {
+        "d_band_centre": -2.3164995976491745,
+        "d_band_width": 0.4931784415206735,
+        "metal_solute": "Pd"
+    },
+    "623cb1e70f940d879820d8e7": {
+        "d_band_centre": -2.6866228825574634,
+        "d_band_width": 0.24832645648109433,
+        "metal_solute": "Pd"
+    },
+    "623c4cca0f940d8798f24d9b": {
+        "d_band_centre": -2.364709922979843,
+        "d_band_width": 0.18680944928558676,
+        "metal_solute": "Pd"
+    },
+    "624004b60f940d8798eed954": {
+        "d_band_centre": -1.095279466875441,
+        "d_band_width": 0.3363783084533246,
+        "metal_solute": "Pd"
+    },
+    "62987e07905366c47becb840": {
+        "d_band_centre": -1.1128525631151374,
+        "d_band_width": 0.13362982949194088,
+        "metal_solute": "Pd"
+    },
+    "629876e1905366c47be8c99e": {
+        "d_band_centre": -2.090646665676091,
+        "d_band_width": 0.5207243036255893,
+        "metal_solute": "Pd"
+    },
+    "6298753c905366c47be7e5c6": {
+        "d_band_centre": -1.9527483368139822,
+        "d_band_width": 0.4529516785873647,
+        "metal_solute": "Pd"
+    },
+    "62988372905366c47befb1ba": {
+        "d_band_centre": -1.767348766749658,
+        "d_band_width": 0.39959507067304423,
+        "metal_solute": "Pd"
+    },
+    "62986e83905366c47be43664": {
+        "d_band_centre": -2.219701531667092,
+        "d_band_width": 0.2699099444530236,
+        "metal_solute": "Pd"
+    },
+    "6298aab9905366c47b054f72": {
+        "d_band_centre": -2.53628908443932,
+        "d_band_width": 0.30803385493238794,
+        "metal_solute": "Cu"
+    },
+    "6298c6a7905366c47b14b844": {
+        "d_band_centre": -1.3971579703744412,
+        "d_band_width": 0.08928003754437966,
+        "metal_solute": "Pd"
+    },
+    "6298ad5b905366c47b06bbfc": {
+        "d_band_centre": -2.2457373026033607,
+        "d_band_width": 0.2330276905425409,
+        "metal_solute": "Pd"
+    },
+    "62987397905366c47be70011": {
+        "d_band_centre": -2.744085769910848,
+        "d_band_width": 0.362205207074956,
+        "metal_solute": "Pd"
+    },
+    "6298779d905366c47be93971": {
+        "d_band_centre": -1.801341336285336,
+        "d_band_width": 0.08222755739494654,
+        "metal_solute": "Pd"
+    },
+    "6298884c905366c47bf25ba0": {
+        "d_band_centre": -1.3965909420223002,
+        "d_band_width": 0.5351302661844357,
+        "metal_solute": "Pd"
+    },
+    "62988632905366c47bf138dd": {
+        "d_band_centre": -2.7480420153941902,
+        "d_band_width": 0.334898574376982,
+        "metal_solute": "Pd"
+    },
+    "62999de4905366c47b95c45f": {
+        "d_band_centre": -2.7742942435111306,
+        "d_band_width": 0.3043141836327648,
+        "metal_solute": "Pd"
+    },
+    "6298e758905366c47b26774d": {
+        "d_band_centre": -3.127611795927974,
+        "d_band_width": 0.4592952314655788,
+        "metal_solute": "Pd"
+    },
+    "6298919f905366c47bf77b2e": {
+        "d_band_centre": -3.0667520053378254,
+        "d_band_width": 0.376642222579334,
+        "metal_solute": "Pd"
+    },
+    "6298f6c8905366c47b2f4f8e": {
+        "d_band_centre": -2.3325214406007584,
+        "d_band_width": 0.6118076722497628,
+        "metal_solute": "Pd"
+    },
+    "6298c772905366c47b1530eb": {
+        "d_band_centre": -2.9920777022159806,
+        "d_band_width": 0.37984001325785205,
+        "metal_solute": "Pd"
+    },
+    "6298c9f9905366c47b168d69": {
+        "d_band_centre": -2.549457699254471,
+        "d_band_width": 0.3009860986439702,
+        "metal_solute": "Pd"
+    },
+    "623b42510f940d8798666715": {
+        "d_band_centre": -1.1444586735913787,
+        "d_band_width": 0.11978763579283326,
+        "metal_solute": "Pt"
+    },
+    "623cb77e0f940d87982375c9": {
+        "d_band_centre": -2.2320450929277182,
+        "d_band_width": 0.23903332434617114,
+        "metal_solute": "Pt"
+    },
+    "623cb8880f940d879823fa4f": {
+        "d_band_centre": -2.862407229883645,
+        "d_band_width": 0.16833521270442345,
+        "metal_solute": "Pt"
+    },
+    "62987d6d905366c47bec65c1": {
+        "d_band_centre": -1.9688994374814006,
+        "d_band_width": 0.20900194595264715,
+        "metal_solute": "Pt"
+    },
+    "6298a263905366c47b00b796": {
+        "d_band_centre": -2.23622393781781,
+        "d_band_width": 0.3159518837855832,
+        "metal_solute": "Pt"
+    },
+    "629879d5905366c47bea6bfa": {
+        "d_band_centre": -3.5129263927602765,
+        "d_band_width": 0.32233831515679523,
+        "metal_solute": "Pt"
+    },
+    "62988318905366c47bef8014": {
+        "d_band_centre": -1.4934469414501284,
+        "d_band_width": 0.12163508365601544,
+        "metal_solute": "Pt"
+    },
+    "62987bd4905366c47beb8bc4": {
+        "d_band_centre": -2.9099136968197414,
+        "d_band_width": 0.3850909408225022,
+        "metal_solute": "Pt"
+    },
+    "6298b903905366c47b0d29a2": {
+        "d_band_centre": -3.1613350363292114,
+        "d_band_width": 0.3603286227457255,
+        "metal_solute": "Pt"
+    },
+    "62999da1905366c47b959ea1": {
+        "d_band_centre": -1.5520185858339943,
+        "d_band_width": 0.6958935468075935,
+        "metal_solute": "Pt"
+    },
+    "6299abf7905366c47b9e3f14": {
+        "d_band_centre": -3.268874588256057,
+        "d_band_width": 0.5461951283974357,
+        "metal_solute": "Pt"
+    },
+    "6298c699905366c47b14b081": {
+        "d_band_centre": -2.6799276090044013,
+        "d_band_width": 0.29681543372736374,
+        "metal_solute": "Pt"
+    },
+    "623b36a50f940d8798612c60": {
+        "d_band_centre": -1.6514357977887617,
+        "d_band_width": 0.2871967776822416,
+        "metal_solute": "Cu"
+    },
+    "623fe4a80f940d8798c5da9d": {
+        "d_band_centre": -1.9130798903732689,
+        "d_band_width": 0.19589617079642696,
+        "metal_solute": "Cu"
+    },
+    "623cfb570f940d8798432faa": {
+        "d_band_centre": -2.39844646138074,
+        "d_band_width": 0.2712139972749676,
+        "metal_solute": "Cu"
+    },
+    "623fd5b40f940d8798b22b8b": {
+        "d_band_centre": -1.8756861490482901,
+        "d_band_width": 0.333679939540757,
+        "metal_solute": "Cu"
+    },
+    "623ceacc0f940d87983b7d31": {
+        "d_band_centre": -2.36035311503677,
+        "d_band_width": 0.12650347952091273,
+        "metal_solute": "Cu"
+    },
+    "623cb0aa0f940d8798204adb": {
+        "d_band_centre": -2.9466083532078606,
+        "d_band_width": 0.24981810320711176,
+        "metal_solute": "Cu"
+    },
+    "6298553b905366c47bd62249": {
+        "d_band_centre": -2.491544004774421,
+        "d_band_width": 0.1661363803102332,
+        "metal_solute": "Cu"
+    },
+    "62988690905366c47bf16cc7": {
+        "d_band_centre": -2.276917805291037,
+        "d_band_width": 0.09851255098152881,
+        "metal_solute": "Cu"
+    },
+    "62986f40905366c47be49c8d": {
+        "d_band_centre": -3.020079702455071,
+        "d_band_width": 0.7224446103713486,
+        "metal_solute": "Cu"
+    },
+    "629888cc905366c47bf2a129": {
+        "d_band_centre": -2.561905211193224,
+        "d_band_width": 0.10876383963297431,
+        "metal_solute": "Cu"
+    },
+    "62988713905366c47bf1b346": {
+        "d_band_centre": -3.1093108256367445,
+        "d_band_width": 0.408056769158854,
+        "metal_solute": "Cu"
+    },
+    "6298fb73905366c47b321251": {
+        "d_band_centre": -2.6399451721028733,
+        "d_band_width": 0.3060475297240174,
+        "metal_solute": "Cu"
+    },
+    "62989866905366c47bfb3b97": {
+        "d_band_centre": -2.631093061893731,
+        "d_band_width": 0.22575713262912833,
+        "metal_solute": "Cu"
+    },
+    "62987424905366c47be74d58": {
+        "d_band_centre": -2.4278562362253147,
+        "d_band_width": 0.10002118811816749,
+        "metal_solute": "Cu"
+    },
+    "629871cf905366c47be5fed3": {
+        "d_band_centre": -3.3045675943225024,
+        "d_band_width": -0.2909150509382893,
+        "metal_solute": "Cu"
+    },
+    "6298b88c905366c47b0cdeae": {
+        "d_band_centre": -2.2758994773916172,
+        "d_band_width": 0.35463497644802927,
+        "metal_solute": "Cu"
+    },
+    "62987188905366c47be5d914": {
+        "d_band_centre": -1.9243307697971836,
+        "d_band_width": 0.18742790062773215,
+        "metal_solute": "Cu"
+    },
+    "629871e6905366c47be60c26": {
+        "d_band_centre": -3.124851044384046,
+        "d_band_width": 0.15278043678270295,
+        "metal_solute": "Cu"
+    },
+    "6298a8be905366c47b0434c1": {
+        "d_band_centre": -1.6435144387676264,
+        "d_band_width": 0.3470385895730648,
+        "metal_solute": "Cu"
+    },
+    "629877be905366c47be94a77": {
+        "d_band_centre": -2.8780340606062826,
+        "d_band_width": 0.16247845839290082,
+        "metal_solute": "Cu"
+    },
+    "6298759f905366c47be81b96": {
+        "d_band_centre": -2.3270637792370077,
+        "d_band_width": 0.2924636610040867,
+        "metal_solute": "Cu"
+    },
+    "62987a83905366c47beaca2a": {
+        "d_band_centre": -2.8119690753519087,
+        "d_band_width": 0.5377244710271742,
+        "metal_solute": "Cu"
+    },
+    "62987798905366c47be935a4": {
+        "d_band_centre": -2.6680695349438057,
+        "d_band_width": 0.11782623044088467,
+        "metal_solute": "Cu"
+    },
+    "629879c4905366c47bea636f": {
+        "d_band_centre": -1.5050458706212166,
+        "d_band_width": 0.5978182683112551,
+        "metal_solute": "Cu"
+    },
+    "629875c3905366c47be82ee4": {
+        "d_band_centre": -2.3606923186647264,
+        "d_band_width": 0.12290126061263826,
+        "metal_solute": "Cu"
+    },
+    "62986d97905366c47be3abc9": {
+        "d_band_centre": -2.15986129103447,
+        "d_band_width": 0.374838289507145,
+        "metal_solute": "Cu"
+    },
+    "6298b85e905366c47b0cc5a1": {
+        "d_band_centre": -2.812357885493977,
+        "d_band_width": 0.4604661291820119,
+        "metal_solute": "Cu"
+    },
+    "6298b6ee905366c47b0bff57": {
+        "d_band_centre": -2.7548014545905115,
+        "d_band_width": 0.3357320401364283,
+        "metal_solute": "Cu"
+    },
+    "6298761a905366c47be85ec4": {
+        "d_band_centre": -2.7510090955591737,
+        "d_band_width": 0.18175098221109337,
+        "metal_solute": "Cu"
+    },
+    "62987bb4905366c47beb77af": {
+        "d_band_centre": -2.8075863204515996,
+        "d_band_width": 0.2789454583745834,
+        "metal_solute": "Cu"
+    },
+    "6298700b905366c47be50afe": {
+        "d_band_centre": -1.735467147082677,
+        "d_band_width": 0.5663676339260004,
+        "metal_solute": "Cu"
+    },
+    "62986ada905366c47be22f85": {
+        "d_band_centre": -1.9107525045497977,
+        "d_band_width": 0.901828263722198,
+        "metal_solute": "Cu"
+    },
+    "6299c811905366c47baf7fcd": {
+        "d_band_centre": -1.9310635532582288,
+        "d_band_width": 0.9814725414332933,
+        "metal_solute": "Cu"
+    },
+    "6299b364905366c47ba2d03a": {
+        "d_band_centre": -2.9961049454466715,
+        "d_band_width": 0.12401635441740487,
+        "metal_solute": "Cu"
+    },
+    "6298856c905366c47bf0cec6": {
+        "d_band_centre": -2.5763831459050177,
+        "d_band_width": 0.3329512444609597,
+        "metal_solute": "Cu"
+    },
+    "62991816905366c47b43b412": {
+        "d_band_centre": -3.1620111723172912,
+        "d_band_width": 0.17653698350359087,
+        "metal_solute": "Cu"
+    },
+    "6298b978905366c47b0d6889": {
+        "d_band_centre": -2.16324593083076,
+        "d_band_width": 0.0776055513419159,
+        "metal_solute": "Cu"
+    },
+    "62989dac905366c47bfe1f06": {
+        "d_band_centre": -2.7424968915631847,
+        "d_band_width": 0.09267740339571835,
+        "metal_solute": "Cu"
+    },
+    "6298e57b905366c47b257b12": {
+        "d_band_centre": -1.9389691680784178,
+        "d_band_width": 1.113468162556635,
+        "metal_solute": "Cu"
+    },
+    "6298e13d905366c47b2309d0": {
+        "d_band_centre": -1.5847381362897321,
+        "d_band_width": 1.0809749696781092,
+        "metal_solute": "Cu"
+    },
+    "6298c6fc905366c47b14f14d": {
+        "d_band_centre": -2.871751527694219,
+        "d_band_width": 0.09027385719252627,
+        "metal_solute": "Cu"
+    },
+    "6298922b905366c47bf7c70b": {
+        "d_band_centre": -2.894999199597818,
+        "d_band_width": 0.2307732892856981,
+        "metal_solute": "Cu"
+    },
+    "6298dd91905366c47b211037": {
+        "d_band_centre": -2.8144515160895933,
+        "d_band_width": 0.08220622722403119,
+        "metal_solute": "Cu"
+    },
+    "6298b63a905366c47b0b9d22": {
+        "d_band_centre": -2.7825079207316343,
+        "d_band_width": 0.1230942764487572,
+        "metal_solute": "Cu"
+    },
+    "6298f758905366c47b2fa158": {
+        "d_band_centre": -2.5465534073796294,
+        "d_band_width": 0.21037226666314426,
+        "metal_solute": "Cu"
+    },
+    "6298d57f905366c47b1cc740": {
+        "d_band_centre": -2.5703768446435546,
+        "d_band_width": 0.2766002245160868,
+        "metal_solute": "Cu"
+    },
+    "6298da9e905366c47b1f8837": {
+        "d_band_centre": -2.9133688570792313,
+        "d_band_width": 0.36004329129085644,
+        "metal_solute": "Cu"
+    },
+    "6298b524905366c47b0b0631": {
+        "d_band_centre": -2.6578677784540377,
+        "d_band_width": 0.3911891636755853,
+        "metal_solute": "Cu"
+    },
+    "629883a3905366c47befcbb4": {
+        "d_band_centre": -2.4217745922478175,
+        "d_band_width": 0.16213067139633708,
+        "metal_solute": "Cu"
+    },
+    "62993f5f905366c47b5ca8b3": {
+        "d_band_centre": -2.609201282884859,
+        "d_band_width": 0.19833685531966605,
+        "metal_solute": "Cu"
+    },
+    "6298cb1b905366c47b17290f": {
+        "d_band_centre": -2.9267162715247994,
+        "d_band_width": 0.6147947974533692,
+        "metal_solute": "Cu"
+    },
+    "6298983e905366c47bfb256c": {
+        "d_band_centre": -2.669885657626463,
+        "d_band_width": 0.4113811657075895,
+        "metal_solute": "Cu"
+    }
+}

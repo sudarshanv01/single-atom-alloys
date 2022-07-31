@@ -1,0 +1,27 @@
+{
+    "623c2d180f940d8798e33ba5": {
+        "d_band_centre": -1.8701125021924314,
+        "d_band_width": 3.1997397242476904,
+        "metal_solute": "Rh"
+    },
+    "623c25e40f940d8798dfa394": {
+        "d_band_centre": -2.2413148466200528,
+        "d_band_width": 4.2838145899505875,
+        "metal_solute": "Ir"
+    },
+    "623c391b0f940d8798e924cf": {
+        "d_band_centre": -1.7841895913197177,
+        "d_band_width": 2.3474760945135786,
+        "metal_solute": "Pd"
+    },
+    "623c22830f940d8798ddf8f1": {
+        "d_band_centre": -2.2827901629287433,
+        "d_band_width": 3.202062832645545,
+        "metal_solute": "Pt"
+    },
+    "623c347a0f940d8798e6ee64": {
+        "d_band_centre": -2.4347036958087998,
+        "d_band_width": 1.1400722446509821,
+        "metal_solute": "Cu"
+    }
+}
