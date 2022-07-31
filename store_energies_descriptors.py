@@ -28,6 +28,7 @@ if __name__ == '__main__':
 
     # Store moments by _id
     moments = defaultdict(dict)
+    ads_energy_dict = defaultdict(dict)
 
     for mp_id in intermetallics:
 
@@ -41,6 +42,9 @@ if __name__ == '__main__':
 
         # Get the adsorption site
         ads_site = intermetallics[mp_id]["adsorption"][0]["ads_site"]
+        # Get the adsorption energy
+        ads_energy = intermetallics[mp_id]["adsorption"][0]["ads_energy"]
+        ads_energy_dict[_id] = ads_energy
 
         # Get the vasprun file
         vr = Vasprun(os.path.join(vaspruns_path, "intermetallics", "slab", _id + "_vasprun.xml.gz"))
@@ -84,3 +88,6 @@ if __name__ == '__main__':
     
     with open(f"outputs/pdos_moments.json", 'w') as handle:
         json.dump(moments, handle, indent=4)
+    # Store adsorption energies
+    with open(f"outputs/ads_energy.json", 'w') as handle:
+        json.dump(ads_energy_dict, handle, indent=4)
