@@ -1,7 +1,8 @@
-import numpy as np
+import pickle
 import json
+import numpy as np
 import matplotlib.pyplot as plt
-from catchemi import NewnsAndersonNumerical, FitParametersNewnsAnderson
+from catchemi import FitParametersNewnsAnderson
 from monty.serialization import loadfn
 from plot_params import get_plot_params
 get_plot_params()
@@ -22,6 +23,10 @@ if __name__ == '__main__':
     constant_offset = ads_parameters['constant_offset'] 
     EPS_SP_MIN = -15
     EPS_SP_MAX = 15
+
+    # Spline parameters
+    with open(f"outputs/spline_objects.pkl", 'rb') as f:
+        spline_objects = pickle.load(f)
 
     # Parameters to change delta
     widths = np.linspace(0.2, 12, 15)
