@@ -1,7 +1,7 @@
 """Perform a simple calculation to get the chemisorption energy."""
 import logging
 import json
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from collections import defaultdict
 
@@ -78,20 +78,25 @@ class SimpleChemisorption:
         of the DFT density of states and the Newns-Anderson
         model energy."""
 
+        # Refresh Delta and Lambda
+        self.get_Delta()
+        self.get_Lambda()
+
         # Create the integral and just numerically integrate it.
         integrand_numer = self.Delta + self.Delta0 
         integrand_denom = self.eps - self.eps_a - self.Lambda 
         arctan_integrand = np.arctan2(integrand_numer, integrand_denom)
+        arctan_integrand -= np.pi
 
         # Make sure that the integral is within limits, otherwise
         # something went wrong with the arctan.
-        assert arctan_integrand <= 0, "Arctan integrand must be negative"
-        assert arctan_integrand >= -np.pi, "Arctan integrand must be greater than -pi"
+        assert np.all(arctan_integrand <= 0), "Arctan integrand must be negative"
+        assert np.all(arctan_integrand >= -np.pi), "Arctan integrand must be greater than -pi" 
 
         E_hyb = np.trapz(arctan_integrand, self.eps)
         E_hyb *= 2 
         E_hyb /= np.pi
-        E_hyb -= self.eps_a
+        E_hyb -= 2*self.eps_a
         self.E_hyb = E_hyb
         assert E_hyb <= 0.0, "Hybridisation energy must be negative"
         return E_hyb
@@ -120,14 +125,16 @@ class SimpleChemisorption:
         numerator = np.trapz(self.Delta[index_], self.eps[index_])
         self.filling = numerator / denominator
         assert self.filling > 0.0, "Filling must be positive"
-        assert self.filling < 0.0, "Filling must be negative"
         return self.filling
 
     def get_orthogonalisation_energy(self) -> float:
         """Get the orthogonalisation energy on the basis of the
         smeared out two-state equation.""" 
+        self.get_Delta()
+        self.get_Lambda()        
         self.get_adsorbate_dos()
         self.get_occupancy()
+        self.get_filling()
         E_ortho = -2 * (self.n_a + self.filling) * self.Vak * self.Sak 
         self.E_ortho = E_ortho
         assert self.E_ortho >= 0.0 , "Orthogonalisation energy must be positive"
@@ -149,7 +156,8 @@ class AdsorbateChemisorption(SimpleChemisorption):
             Delta0: float,
             eps_a_data: List,
     ):
-        super.__init__(Delta0=Delta0)
+
+        self.Delta0 = Delta0
 
         # Treat each adsorbate separately.
         model_outputs = defaultdict(dict) 
@@ -168,6 +176,8 @@ class AdsorbateChemisorption(SimpleChemisorption):
                 # Store the float values of Vak and Sak
                 self.Vak = Vak_list[i]
                 self.Sak = Sak_list[i]
+
+                self._validate_inputs()
 
                 # Compute the chemisorption energy.
                 e_hyb = self.get_hybridisation_energy()
@@ -203,11 +213,19 @@ class FittingParameters:
         self.data = data
     
     def objective_function(self,
-                           alpha: nptyp.ArrayLike,
-                           beta: nptyp.ArrayLike,
-                           gamma: float,
+                            x: Tuple,
     ) -> float:
         """Objective function to be minimised."""
+        # Infer the parameters from the length of the
+        # input tuple.
+        # The constant parmeter must always come last
+        gamma = x[-1]
+        # Alpha will be the first len(eps_a_data) parameters
+        alpha = x[:len(self.eps_a_data)]
+        # Beta will be the rest
+        beta = x[len(self.eps_a_data):-1]
+
+        assert len(alpha) == len(beta) == len(self.eps_a_data), "Parameters must be of equal length"
 
         # make sure both alpha and beta are always positive
         alpha = np.abs(alpha)
@@ -228,7 +246,7 @@ class FittingParameters:
             Vsd = np.array(Vsd)
 
             # Store the inputs.
-            inputs['dos_data'][_id]['pdos'] = pdos
+            inputs['dos_data'][_id]['dft_dos'] = pdos
             inputs['dos_data'][_id]['eps'] = energy_grid
             inputs['Vak_data'][_id] = np.sqrt(beta) * Vsd
             inputs['Sak_data'][_id] = -alpha * Vsd
@@ -239,7 +257,7 @@ class FittingParameters:
 
         # Compute the RMSE value for the difference between
         # the model and DFT data.
-        root_mean_square_error = 0.0
+        mean_absolute_error = 0.0
         for _id in model_outputs:
             # What we will compare against
             ads_energy_DFT = self.data[_id]["ads_energy"]
@@ -253,30 +271,42 @@ class FittingParameters:
             model_energy += gamma
 
             # Compute the RMSE
-            sq_error = (model_energy - ads_energy_DFT)**2
-            root_mean_square_error += sq_error
+            sq_error = np.abs(model_energy - ads_energy_DFT)
+            mean_absolute_error += sq_error
         
         # Return the RMSE
-        root_mean_square_error = np.sqrt(np.sum(root_mean_square_error) / len(self.data))
+        mean_absolute_error = mean_absolute_error / len(model_outputs) 
 
-        return root_mean_square_error
+        logging.info(f"Parameters: {x} leads to mean absolute error: {mean_absolute_error}eV")
+
+        return mean_absolute_error
 
                 
 if __name__ == '__main__':
     """Test out the density of states method of the class."""
 
-    JSON_FILENAME = "outputs/intermetallic_pdos_moments.json"
+    logging.basicConfig(level=logging.INFO)
+
+    JSON_FILENAME = "outputs/intermetallics_pdos_moments.json"
     DELTA0 = 0.1 # eV
     EPS_A = [-7, 2.5] # For CO*
+    logging.info("Loading data from {}".format(JSON_FILENAME))
+    logging.info("Using Delta0 = {} eV".format(DELTA0))
+    logging.info("Using eps_a = {} eV".format(EPS_A))
 
     # Perform the fitting routine to get the parameters.
     fitting_parameters = FittingParameters(JSON_FILENAME, EPS_A, DELTA0)
     fitting_parameters.load_data()
-    alpha, beta, gamma = scipy.optimize.fmin(fitting_parameters.objective_function,
-                                             x0=[0.1, 0.1, 0.0])
+    parameters = scipy.optimize.fmin(fitting_parameters.objective_function,
+                                             x0=[0.1, 0.1, 1, 1, 0.1])
 
     # Store the parameters in a json file
-    fitted_params = {'alpha': list(alpha), 'beta': list(beta), 'gamma': gamma}
+    fitted_params = {
+        "alpha": parameters[:len(EPS_A)],
+        "beta": parameters[len(EPS_A):-1],
+        "gamma": parameters[-1],
+    }
+
     with open("outputs/fitting_parameters.json", "w") as handle:
         json.dump(fitted_params, handle)
 
