@@ -311,6 +311,68 @@ class FittingParameters:
             data = json.load(f)
         self.data = data
 
+    def get_comparison_fitting(self, x: Tuple) -> Tuple[List, List]:
+        """Check the goodness of the fit by returning
+        both the predicted and actual values."""
+        gamma = x[-1]
+        # Alpha will be the first len(eps_a_data) parameters
+        alpha = x[: len(self.eps_a_data)]
+        # Beta will be the rest
+        beta = x[len(self.eps_a_data) : -1]
+
+        assert (
+            len(alpha) == len(beta) == len(self.eps_a_data)
+        ), "Parameters must be of equal length"
+
+        # make sure both alpha and beta are always positive
+        alpha = np.abs(alpha)
+        beta = np.abs(beta)
+
+        # Prepare inputs to the Model class.
+        inputs = defaultdict(lambda: defaultdict(dict))
+        inputs["Delta0"] = self.Delta0
+        inputs["eps_a_data"] = self.eps_a_data
+
+        for _id in self.data:
+            # Parse the relevant quantities from the
+            # supplied dictionary.
+            pdos = self.data[_id]["pdos"]
+            energy_grid = self.data[_id]["energy_grid"]
+            Vsd = self.data[_id]["Vsd"]
+            # Make Vsd an array
+            Vsd = np.array(Vsd)
+
+            # Store the inputs.
+            inputs["dos_data"][_id]["dft_dos"] = pdos
+            inputs["dos_data"][_id]["eps"] = energy_grid
+            inputs["Vak_data"][_id] = np.sqrt(beta) * Vsd
+            inputs["Sak_data"][_id] = -alpha * Vsd
+
+        # Get the outputs
+        model_energies_class = AdsorbateChemisorption(**inputs)
+        model_outputs = model_energies_class.model_outputs
+
+        predicted_energy = []
+        actual_energy = []
+        for _id in model_outputs:
+            # What we will compare against
+            ads_energy_DFT = self.data[_id]["ads_energy"]
+            actual_energy.append(ads_energy_DFT)
+
+            # Construct the model energy
+            model_energy = 0.0
+            # Add separately for each eps_a
+            for eps_a in model_outputs[_id]:
+                model_energy += model_outputs[_id][eps_a]["chemi"]
+
+            # Add a constant parameter gamma
+            model_energy += gamma
+            predicted_energy.append(model_energy)
+
+        logging.info("Predicted and actual energies parsed.")
+
+        return predicted_energy, actual_energy
+
     def objective_function(
         self,
         x: Tuple,
