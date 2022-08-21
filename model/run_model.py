@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     logging.info("Start fitting routine.")
 
-    JSON_FILENAME = "outputs/intermetallics_pdos_moments.json"
+    JSON_FILENAME = "inputs/intermetallics_pdos_moments.json"
     OUTPUT_FILE = "outputs/fitting_parameters.json"
     DELTA0 = 0.1  # eV
     EPS_A = [-7, 2.5]  # For CO*
@@ -59,4 +59,4 @@ if __name__ == "__main__":
     }
 
     with open(OUTPUT_FILE, "w") as handle:
-        json.dump(fitted_params, handle)
+        json.dump(fitted_params, handle, indent=4)

@@ -30,12 +30,12 @@ def semi_ellipse(energies, eps_d, width, amp):
 
 
 def create_coupling_elements(
-    s_metal,
-    s_Cu,
-    anderson_band_width,
-    anderson_band_width_Cu,
-    r=None,
-    r_Cu=None,
+    s_metal: float,
+    s_Cu: float,
+    anderson_band_width: float,
+    anderson_band_width_Cu: float,
+    r: float = None,
+    r_Cu: float = None,
     normalise_bond_length=False,
     normalise_by_Cu=True,
 ):
@@ -78,19 +78,19 @@ if __name__ == "__main__":
     for type_calc in ["intermetallics", "elementals"]:
 
         # Data is stored in different files
-        dict_data = loadfn(f"{type_calc}.json")
+        dict_data = loadfn(f"inputs/{type_calc}.json")
 
         output_data = defaultdict(dict)
 
         for mp_id in dict_data:
 
-            # Get the slab id
-            _id = dict_data[mp_id]["slabs"][0]["id"]
-
             # Make a separate plot for each intermetallic
             fig, ax = plt.subplots(1, 1, figsize=(4, 6), constrained_layout=True)
             ax.set_ylabel("Energy (eV)")
             ax.set_xlabel("Projected DOS")
+
+            # Get the slab id
+            _id = dict_data[mp_id]["slabs"][0]["id"]
 
             # Get the adsorption site
             ads_site = dict_data[mp_id]["adsorption"][0]["ads_site"]
@@ -112,6 +112,8 @@ if __name__ == "__main__":
             ads_metal = structure[ads_site].specie.symbol
             bond_length = data_from_LMTO["s"][ads_metal] * units.Bohr
             bond_length_Cu = data_from_LMTO["s"]["Cu"] * units.Bohr
+
+            # Calculate and store the coupling elements
             Vsdsq = create_coupling_elements(
                 s_metal=s_data[ads_metal],
                 s_Cu=s_data["Cu"],
@@ -128,6 +130,15 @@ if __name__ == "__main__":
 
             # Get the metal atom to which the CO is bound
             metal_solute = structure[ads_site].specie.symbol
+
+            # Generate a list of all species in the structure
+            species = [site.specie.symbol for site in structure]
+            species = np.unique(species).tolist()
+            if len(species) >= 3:
+                # Don't store species that are greater than
+                # three elements long.
+                logging.warning(f"{mp_id} has {species} and is currently not stored.")
+                continue
 
             # Extract the projected density of states
             pdos = dos.get_site_spd_dos(structure[ads_site])[OrbitalType.d]
@@ -157,27 +168,28 @@ if __name__ == "__main__":
             ax.axhline(center_ase + width_ase, color="tab:blue", linestyle="--")
             ax.axhline(center_ase - width_ase, color="tab:blue", linestyle="--")
 
+            # Generate output_data
             output_data[_id]["d_band_centre"] = centre
             output_data[_id]["d_band_width"] = width
             output_data[_id]["metal_solute"] = metal_solute
-            # Store the normalised density of states as well
             output_data[_id]["pdos"] = pdos_extract.tolist()
-            # Store the energy as well
             output_data[_id]["energy_grid"] = energy.tolist()
             output_data[_id]["ads_energy"] = ads_energy
-            # Store the coupling element
             output_data[_id]["Vsd"] = float(Vsd)
+            output_data[_id]["species"] = species
+            output_data[_id]["coord_num"] = dict_data[mp_id]["adsorption"][0][
+                "coord_num"
+            ]
             logging.info(f"Stored {_id}")
 
             # Plot semi-ellipse
-            ax.plot(
-                semi_ellipse(energy, centre, width, amp), energy, "-", color="tab:green"
-            )
-
-            ax.set_ylim([center_ase - 7, center_ase + 7])
+            # ax.plot(
+            #     semi_ellipse(energy, centre, width, amp), energy, "-", color="tab:green"
+            # )
+            # ax.set_ylim([center_ase - 7, center_ase + 7])
             # Save the figure
-            fig.savefig(os.path.join("plots", "intermetallics", _id + ".png"))
-            plt.close(fig)
+            # fig.savefig(os.path.join("plots", "intermetallics", _id + ".png"))
+            # plt.close(fig)
 
         with open(f"outputs/{type_calc}_pdos_moments.json", "w") as handle:
             json.dump(output_data, handle, indent=4)

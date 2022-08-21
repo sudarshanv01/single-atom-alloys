@@ -12,7 +12,7 @@ if __name__ == "__main__":
     chemisorption energies to see if the model fit
     is good enough."""
 
-    JSON_FILENAME = "outputs/intermetallics_pdos_moments.json"
+    JSON_FILENAME = "inputs/intermetallics_pdos_moments.json"
     OUTPUT_FILE = "outputs/fitting_parameters.json"
     DELTA0 = 0.1  # eV
     EPS_A = [-7, 2.5]  # For CO*
