@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from scipy.optimize import curve_fit
+from scipy.ndimage import gaussian_filter1d
+
 from monty.serialization import loadfn
 
 from pymatgen.electronic_structure.core import OrbitalType
@@ -108,6 +110,9 @@ if __name__ == "__main__":
             dos = vr.complete_dos
             structure = dos.structure
 
+            # Write out strcuture as an xyz file
+            structure.to(filename=f"{type_calc}/{mp_id}.xyz")
+
             # Get the bond length from the LMTO calculations
             ads_metal = structure[ads_site].specie.symbol
             bond_length = data_from_LMTO["s"][ads_metal] * units.Bohr
@@ -142,15 +147,20 @@ if __name__ == "__main__":
 
             # Extract the projected density of states
             pdos = dos.get_site_spd_dos(structure[ads_site])[OrbitalType.d]
-
-            # Make x and y variables to plot
             pdos_extract = pdos.get_densities()
+            # Extract the energies from the projected density of states
+            # and reference to the Fermi level
+            energy = pdos.energies - pdos.efermi
+
+            # Smear out the projected density of states
+            sigma = 0.1  # can change if needed
+            diff = [energy[i + 1] - energy[i] for i in range(len(energy) - 1)]
+            avgdiff = sum(diff) / len(diff)
+            pdos_extract = gaussian_filter1d(pdos_extract, sigma / avgdiff)
 
             # Normalise the extracted pdos
             normalising_integral = np.trapz(pdos_extract, dos.energies)
             pdos_extract /= normalising_integral
-
-            energy = pdos.energies - pdos.efermi
 
             # Get the band centres and widths
             center_ase, width_ase = get_distribution_moment(
@@ -182,14 +192,16 @@ if __name__ == "__main__":
             ]
             logging.info(f"Stored {_id}")
 
-            # Plot semi-ellipse
+            ax.plot(pdos_extract, energy, "-", color="k")
+            ax.set_xlabel("Projected DOS")
+            ax.set_ylabel("Energy (eV)")
             # ax.plot(
             #     semi_ellipse(energy, centre, width, amp), energy, "-", color="tab:green"
             # )
             # ax.set_ylim([center_ase - 7, center_ase + 7])
             # Save the figure
-            # fig.savefig(os.path.join("plots", "intermetallics", _id + ".png"))
-            # plt.close(fig)
+            fig.savefig(os.path.join("plots", type_calc, _id + ".png"))
+            plt.close(fig)
 
         with open(f"outputs/{type_calc}_pdos_moments.json", "w") as handle:
             json.dump(output_data, handle, indent=4)
