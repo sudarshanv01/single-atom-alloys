@@ -110,8 +110,8 @@ if __name__ == "__main__":
             dos = vr.complete_dos
             structure = dos.structure
 
-            # Write out strcuture as an xyz file
-            structure.to(filename=f"{type_calc}/{mp_id}.xyz")
+            # Write out the structures
+            structure.to(filename=f"outputs/{type_calc}/{mp_id}_structure.cif")
 
             # Get the bond length from the LMTO calculations
             ads_metal = structure[ads_site].specie.symbol
@@ -139,11 +139,11 @@ if __name__ == "__main__":
             # Generate a list of all species in the structure
             species = [site.specie.symbol for site in structure]
             species = np.unique(species).tolist()
-            if len(species) >= 3:
-                # Don't store species that are greater than
-                # three elements long.
-                logging.warning(f"{mp_id} has {species} and is currently not stored.")
-                continue
+            # if len(species) >= 3:
+            #     # Don't store species that are greater than
+            #     # three elements long.
+            #     logging.warning(f"{mp_id} has {species} and is currently not stored.")
+            #     continue
 
             # Extract the projected density of states
             pdos = dos.get_site_spd_dos(structure[ads_site])[OrbitalType.d]
@@ -152,6 +152,21 @@ if __name__ == "__main__":
             # and reference to the Fermi level
             energy = pdos.energies - pdos.efermi
 
+            # If the lowest energy is higher than -20, pad
+            # the pdos array with zeros and the energy arrays
+            # till -20
+            if np.min(energy) > -20:
+                # Pad the energy array with linear spacing
+                # until -20
+                energy_spacing = energy[1] - energy[0]
+                energy_left = np.arange(-20, np.min(energy), energy_spacing)
+                # Pad the pdos array with zeros
+                pdos_left = np.zeros(len(energy_left))
+                # Concatenate the arrays
+                energy = np.concatenate((energy_left, energy))
+                pdos_extract = np.concatenate((pdos_left, pdos_extract))
+
+
             # Smear out the projected density of states
             sigma = 0.1  # can change if needed
             diff = [energy[i + 1] - energy[i] for i in range(len(energy) - 1)]
@@ -159,7 +174,7 @@ if __name__ == "__main__":
             pdos_extract = gaussian_filter1d(pdos_extract, sigma / avgdiff)
 
             # Normalise the extracted pdos
-            normalising_integral = np.trapz(pdos_extract, dos.energies)
+            normalising_integral = np.trapz(pdos_extract, energy)
             pdos_extract /= normalising_integral
 
             # Get the band centres and widths
@@ -173,6 +188,7 @@ if __name__ == "__main__":
 
             # Plot the band centre and width as
             ax.plot(pdos_extract, energy, "-", color="k")
+            ax.plot(pdos_extract, energy, ".", color="k", alpha=0.1)
             ax.fill_between(pdos_extract, 0, energy, color="k", alpha=0.2)
             ax.axhline(center_ase, color="tab:red", linestyle="--")
             ax.axhline(center_ase + width_ase, color="tab:blue", linestyle="--")
@@ -195,10 +211,7 @@ if __name__ == "__main__":
             ax.plot(pdos_extract, energy, "-", color="k")
             ax.set_xlabel("Projected DOS")
             ax.set_ylabel("Energy (eV)")
-            # ax.plot(
-            #     semi_ellipse(energy, centre, width, amp), energy, "-", color="tab:green"
-            # )
-            # ax.set_ylim([center_ase - 7, center_ase + 7])
+            ax.set_ylim([-20, center_ase + 7])
             # Save the figure
             fig.savefig(os.path.join("plots", type_calc, _id + ".png"))
             plt.close(fig)

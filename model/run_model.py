@@ -19,25 +19,31 @@ if __name__ == "__main__":
     OUTPUT_FILE = "outputs/fitting_parameters.json"
     DELTA0 = 0.1  # eV
     EPS_A = [-7, 2.5]  # For CO*
+    DEBUG = True
     logging.info("Loading data from {}".format(JSON_FILENAME))
     logging.info("Using Delta0 = {} eV".format(DELTA0))
     logging.info("Using eps_a = {} eV".format(EPS_A))
+    if DEBUG:
+        logging.info("Running in DEBUG mode.")
 
-    if sys.argv[1] == "restart":
-        logging.info("Restarting from previous run.")
-        with open(OUTPUT_FILE, "r") as f:
-            initial_guess_dict = json.load(f)
-            initial_guess = (
-                initial_guess_dict["alpha"]
-                + initial_guess_dict["beta"]
-                + [initial_guess_dict["gamma"]]
-            )
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "restart":
+            logging.info("Restarting from previous run.")
+            with open(OUTPUT_FILE, "r") as f:
+                initial_guess_dict = json.load(f)
+                initial_guess = (
+                    initial_guess_dict["alpha"]
+                    + initial_guess_dict["beta"]
+                    + [initial_guess_dict["gamma"]]
+                )
+        else:
+            raise ValueError("Invalid argument. Only `restart` is allowed.")
     else:
         logging.info("Starting from scratch.")
-        initial_guess = [0.1, 0.1, 0.1, 0.1, 0.1]
+        initial_guess = [0.1, 0.1] * len(EPS_A) + [0.1]
 
     # Perform the fitting routine to get the parameters.
-    fitting_parameters = FittingParameters(JSON_FILENAME, EPS_A, DELTA0)
+    fitting_parameters = FittingParameters(JSON_FILENAME, EPS_A, DELTA0, DEBUG=DEBUG)
     fitting_parameters.load_data()
     parameters = scipy.optimize.fmin(
         fitting_parameters.objective_function, x0=initial_guess

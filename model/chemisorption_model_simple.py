@@ -1,4 +1,5 @@
 """Perform a simple calculation to get the chemisorption energy."""
+from distutils.debug import DEBUG
 import os
 import logging
 import json
@@ -9,6 +10,8 @@ from collections import defaultdict
 import numpy as np
 import numpy.typing as nptyp
 import scipy
+from scipy import optimize
+from scipy import signal
 
 import matplotlib.pyplot as plt
 
@@ -32,6 +35,7 @@ class SimpleChemisorption:
         Sak: float,
         Delta0: float,
         eps_a: float,
+        DEBUG: bool, 
     ):
         self.dft_dos = dft_dos
         self.eps = dft_energy_range
@@ -39,6 +43,7 @@ class SimpleChemisorption:
         self.Sak = Sak
         self.Delta0 = Delta0
         self.eps_a = eps_a
+        self.DEBUG = DEBUG
 
         self._validate_inputs()
         # Get the quantities that will be used again and
@@ -138,60 +143,64 @@ class SimpleChemisorption:
         try:
             assert self.E_hyb <= 0.0, "Hybridisation energy must be negative"
         except AssertionError as e:
-            # Plot the function of the energy_integrand
-            # fig, ax = plt.subplots(1, 1, figsize=(6, 4), constrained_layout=True)
-            # ax.plot(
-            #     self.eps[ind_below_fermi],
-            #     integrand_numer / integrand_denom,
-            #     color="k",
-            #     label="integral",
-            # )
-            # ax.fill_between(
-            #     self.eps[ind_below_fermi],
-            #     0,
-            #     integrand_numer / integrand_denom,
-            #     color="k",
-            #     alpha=0.2,
-            # )
-            # # Plot the components of the integral as well
-            # ax2 = ax.twinx()
-            # ax2.plot(
-            #     self.eps[ind_below_fermi],
-            #     self.Delta[ind_below_fermi],
-            #     color="C0",
-            #     label="$\Delta$",
-            # )
-            # ax2.plot(
-            #     self.eps[ind_below_fermi],
-            #     self.Delta0 * np.ones(len(self.eps[ind_below_fermi])),
-            #     color="C1",
-            #     label="$\Delta_0$",
-            # )
-            # ax2.plot(
-            #     self.eps[ind_below_fermi],
-            #     self.Lambda[ind_below_fermi],
-            #     color="C2",
-            #     label="$\Lambda$",
-            # )
-            # ax2.plot(
-            #     self.eps[ind_below_fermi],
-            #     self.eps[ind_below_fermi] - self.eps_a,
-            #     color="C3",
-            #     label="$\epsilon - \epsilon_a$",
-            # )
-            # ax.set_xlabel("Energy (eV)")
-            # ax.set_ylabel("Integrand")
-            # ax2.set_ylabel("Parameters")
-            # ax2.set_ylim([np.min(self.Lambda), np.max(self.Delta)])
-            # fig.savefig(os.path.join(self.debug_dir, "integrand.png"), dpi=300)
-
             if self.E_hyb < self.INTEGRAL_NOISE:
                 logging.warning(
-                    f"Hybridisation energy is very slightly greater than 0 ({self.E_hyb:0.2f} eV). This is probably due to numerical integration errors. Setting it to 0."
+                    f"Numerically, E_hyb is very slightly greater than 0 ({self.E_hyb:0.2f} eV). Setting it to 0."
                 )
                 self.E_hyb = 0.0
             else:
-                # Stop with assertion
+                # Store the calculation.
+                if self.DEBUG:
+                    # Plot the function of the energy_integrand
+                    fig, ax = plt.subplots(1, 1, figsize=(6, 4), constrained_layout=True)
+                    ax.plot(
+                        self.eps[ind_below_fermi],
+                        arctan_integrand,
+                        color="k",
+                        label="integral",
+                    )
+                    ax.fill_between(
+                        self.eps[ind_below_fermi],
+                        0,
+                        arctan_integrand,
+                        color="k",
+                        alpha=0.2,
+                    )
+                    # Plot the components of the integral as well
+                    ax2 = ax.twinx()
+                    ax2.plot(
+                        self.eps[ind_below_fermi],
+                        self.Delta[ind_below_fermi],
+                        color="C0",
+                        label="$\Delta$",
+                    )
+                    ax2.plot(
+                        self.eps[ind_below_fermi],
+                        self.Delta0 * np.ones(len(self.eps[ind_below_fermi])),
+                        color="C1",
+                        label="$\Delta_0$",
+                    )
+                    ax2.plot(
+                        self.eps[ind_below_fermi],
+                        self.Lambda[ind_below_fermi],
+                        color="C2",
+                        label="$\Lambda$",
+                    )
+                    ax2.plot(
+                        self.eps[ind_below_fermi],
+                        self.eps[ind_below_fermi] - self.eps_a,
+                        color="C3",
+                        label="$\epsilon - \epsilon_a$",
+                    )
+                    ax.set_xlabel("Energy (eV)")
+                    ax.set_ylabel("arctan(Integrand)")
+                    ax2.set_ylabel("Parameters")
+                    ax2.set_ylim([np.min(self.Lambda), np.max(self.Delta)])
+                    logging.warning(f"Plotting the components of the integral to {self.debug_dir}/integrand.png")
+                    fig.savefig(os.path.join(self.debug_dir, "integrand.png"), dpi=300)
+                    plt.close(fig)
+
+                # Cannot proceed, error with Hybridisation energy.
                 raise e
 
         return self.E_hyb
@@ -252,9 +261,11 @@ class AdsorbateChemisorption(SimpleChemisorption):
         Sak_data: Dict,
         Delta0: float,
         eps_a_data: List,
+        DEBUG: bool,
     ):
 
         self.Delta0 = Delta0
+        self.DEBUG = DEBUG
 
         # Treat each adsorbate separately.
         model_outputs = defaultdict(dict)
@@ -300,10 +311,12 @@ class FittingParameters:
         json_filename: str,
         eps_a_data: List,
         Delta0: float,
+        DEBUG: bool,
     ):
         self.json_filename = json_filename
         self.eps_a_data = eps_a_data
         self.Delta0 = Delta0
+        self.DEBUG = DEBUG
 
     def load_data(self):
         """Load the data from the json file."""
@@ -332,6 +345,7 @@ class FittingParameters:
         inputs = defaultdict(lambda: defaultdict(dict))
         inputs["Delta0"] = self.Delta0
         inputs["eps_a_data"] = self.eps_a_data
+        inputs["DEBUG"] = self.DEBUG
 
         for _id in self.data:
             # Parse the relevant quantities from the
@@ -399,6 +413,7 @@ class FittingParameters:
         inputs = defaultdict(lambda: defaultdict(dict))
         inputs["Delta0"] = self.Delta0
         inputs["eps_a_data"] = self.eps_a_data
+        inputs["DEBUG"] = self.DEBUG
 
         for _id in self.data:
             # Parse the relevant quantities from the

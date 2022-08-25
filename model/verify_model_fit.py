@@ -16,6 +16,7 @@ if __name__ == "__main__":
     OUTPUT_FILE = "outputs/fitting_parameters.json"
     DELTA0 = 0.1  # eV
     EPS_A = [-7, 2.5]  # For CO*
+    DEBUG = True
 
     with open(OUTPUT_FILE, "r") as f:
         final_params_dict = json.load(f)
@@ -26,7 +27,7 @@ if __name__ == "__main__":
         )
 
     # Perform the fitting routine to get the parameters.
-    fitting_parameters = FittingParameters(JSON_FILENAME, EPS_A, DELTA0)
+    fitting_parameters = FittingParameters(JSON_FILENAME, EPS_A, DELTA0, DEBUG=DEBUG)
     fitting_parameters.load_data()
     predicted, actual = fitting_parameters.get_comparison_fitting(final_params)
 
