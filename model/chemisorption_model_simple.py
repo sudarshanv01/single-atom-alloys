@@ -29,8 +29,8 @@ class SimpleChemisorption:
 
     def __init__(
         self,
-        dft_dos: nptyp.ArrayLike,
-        dft_energy_range: nptyp.ArrayLike,
+        dft_dos: List[float],
+        dft_energy_range: List[float],
         Vak: float,
         Sak: float,
         Delta0: float,
@@ -261,7 +261,7 @@ class AdsorbateChemisorption(SimpleChemisorption):
         Sak_data: Dict,
         Delta0: float,
         eps_a_data: List,
-        DEBUG: bool,
+        DEBUG: bool = False,
     ):
 
         self.Delta0 = Delta0
@@ -311,12 +311,30 @@ class FittingParameters:
         json_filename: str,
         eps_a_data: List,
         Delta0: float,
-        DEBUG: bool,
+        factor_mult_epsa: List[float] = None,
+        DEBUG: bool = False,
     ):
         self.json_filename = json_filename
         self.eps_a_data = eps_a_data
         self.Delta0 = Delta0
         self.DEBUG = DEBUG
+        self.factor_mult_epsa = factor_mult_epsa
+
+        self._validate_inputs()
+
+    def _validate_inputs(self):
+        """Validate inputs to make sure everything has
+        the right dimensions and type."""
+        assert isinstance(self.eps_a_data, list), "eps_a_data must be a list"
+        assert isinstance(self.Delta0, float), "Delta0 must be a float"
+        if self.factor_mult_epsa is not None:
+            assert isinstance(self.factor_mult_epsa, list), "factor_mult_epsa must be a list"
+
+        # Convert the eps_a_data to a numpy array.
+        self.eps_a_data = np.array(self.eps_a_data)
+        # Convert multiple eps_a_data to a numpy array.
+        if self.factor_mult_epsa is not None:
+            self.factor_mult_epsa = np.array(self.factor_mult_epsa)
 
     def load_data(self):
         """Load the data from the json file."""
@@ -324,18 +342,12 @@ class FittingParameters:
             data = json.load(f)
         self.data = data
 
-    def get_comparison_fitting(self, x: Tuple) -> Tuple[List, List]:
+    def get_comparison_fitting(self, x: Tuple) -> Dict: 
         """Check the goodness of the fit by returning
         both the predicted and actual values."""
-        gamma = x[-1]
-        # Alpha will be the first len(eps_a_data) parameters
-        alpha = x[: len(self.eps_a_data)]
-        # Beta will be the rest
-        beta = x[len(self.eps_a_data) : -1]
 
-        assert (
-            len(alpha) == len(beta) == len(self.eps_a_data)
-        ), "Parameters must be of equal length"
+        # Only one set of parameters are allowed.
+        alpha, beta, gamma = x
 
         # make sure both alpha and beta are always positive
         alpha = np.abs(alpha)
@@ -347,6 +359,7 @@ class FittingParameters:
         inputs["eps_a_data"] = self.eps_a_data
         inputs["DEBUG"] = self.DEBUG
 
+        # --- Metal specific parameters
         for _id in self.data:
             # Parse the relevant quantities from the
             # supplied dictionary.
@@ -359,8 +372,8 @@ class FittingParameters:
             # Store the inputs.
             inputs["dos_data"][_id]["dft_dos"] = pdos
             inputs["dos_data"][_id]["eps"] = energy_grid
-            inputs["Vak_data"][_id] = np.sqrt(beta) * Vsd
-            inputs["Sak_data"][_id] = -alpha * Vsd
+            inputs["Vak_data"][_id] = self.factor_mult_epsa * np.sqrt(beta) * Vsd
+            inputs["Sak_data"][_id] = - self.factor_mult_epsa * alpha * Vsd
 
         # Get the outputs
         model_energies_class = AdsorbateChemisorption(**inputs)
@@ -368,6 +381,10 @@ class FittingParameters:
 
         predicted_energy = []
         actual_energy = []
+        id_order = []
+        # Store the string of species as well
+        species_string = []
+
         for _id in model_outputs:
             # What we will compare against
             ads_energy_DFT = self.data[_id]["ads_energy"]
@@ -375,6 +392,7 @@ class FittingParameters:
 
             # Construct the model energy
             model_energy = 0.0
+
             # Add separately for each eps_a
             for eps_a in model_outputs[_id]:
                 model_energy += model_outputs[_id][eps_a]["chemi"]
@@ -383,27 +401,32 @@ class FittingParameters:
             model_energy += gamma
             predicted_energy.append(model_energy)
 
+            # Store the _id as well
+            id_order.append(_id)
+
+            # Store the species string
+            spec_string = ''.join(self.data[_id]["species"])
+            species_string.append(spec_string)
+
         logging.info("Predicted and actual energies parsed.")
 
-        return predicted_energy, actual_energy
+        # return predicted_energy, actual_energy, id_order
+        output_data = {}
+        output_data["predicted_energy"] = predicted_energy
+        output_data["actual_energy"] = actual_energy
+        output_data["id_order"] = id_order
+        output_data["species_string"] = species_string
+
+        return output_data
 
     def objective_function(
         self,
         x: Tuple,
     ) -> float:
         """Objective function to be minimised."""
-        # Infer the parameters from the length of the
-        # input tuple.
-        # The constant parmeter must always come last
-        gamma = x[-1]
-        # Alpha will be the first len(eps_a_data) parameters
-        alpha = x[: len(self.eps_a_data)]
-        # Beta will be the rest
-        beta = x[len(self.eps_a_data) : -1]
 
-        assert (
-            len(alpha) == len(beta) == len(self.eps_a_data)
-        ), "Parameters must be of equal length"
+        # Single set of parameters
+        alpha, beta, gamma = x
 
         # make sure both alpha and beta are always positive
         alpha = np.abs(alpha)
@@ -427,8 +450,8 @@ class FittingParameters:
             # Store the inputs.
             inputs["dos_data"][_id]["dft_dos"] = pdos
             inputs["dos_data"][_id]["eps"] = energy_grid
-            inputs["Vak_data"][_id] = np.sqrt(beta) * Vsd
-            inputs["Sak_data"][_id] = -alpha * Vsd
+            inputs["Vak_data"][_id] = self.factor_mult_epsa * np.sqrt(beta) * Vsd
+            inputs["Sak_data"][_id] = - self.factor_mult_epsa * alpha * Vsd
 
         # Get the outputs
         model_energies_class = AdsorbateChemisorption(**inputs)
