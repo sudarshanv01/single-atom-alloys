@@ -19,8 +19,8 @@ if __name__ == "__main__":
     OUTPUT_FILE = "outputs/fitting_parameters.json"
     DELTA0 = 0.1  # eV
     EPS_A = [-7, 2.5]  # For CO*
-    FACTOR_EPSA = [1.3, 1]
     DEBUG = True
+
     logging.info("Loading data from {}".format(JSON_FILENAME))
     logging.info("Using Delta0 = {} eV".format(DELTA0))
     logging.info("Using eps_a = {} eV".format(EPS_A))
@@ -41,27 +41,33 @@ if __name__ == "__main__":
             raise ValueError("Invalid argument. Only `restart` is allowed.")
     else:
         logging.info("Starting from scratch.")
-        initial_guess = [0.1, 0.1, 0.1]
+        initial_guess = [0.1, 0.1, 0.1, 0.1]
 
     # Perform the fitting routine to get the parameters.
-    fitting_parameters = FittingParameters(JSON_FILENAME, EPS_A, DELTA0, DEBUG=DEBUG, factor_mult_epsa=FACTOR_EPSA)
+    fitting_parameters = FittingParameters(
+        JSON_FILENAME,
+        EPS_A,
+        DELTA0,
+        DEBUG=DEBUG,
+    )
     fitting_parameters.load_data()
     parameters = scipy.optimize.fmin(
         fitting_parameters.objective_function, x0=initial_guess
     )
 
     # Store the parameters in a json file
-    alpha, beta, gamma = parameters
+    alpha, beta, gamma, *epsilon = parameters
 
     alpha = np.abs(alpha)
     beta = np.abs(beta)
     gamma = float(gamma)
+    epsilon = np.abs(epsilon).tolist()
 
     fitted_params = {
         "alpha": alpha,
         "beta": beta,
         "gamma": gamma,
-        "factor_mult_epsa": FACTOR_EPSA,
+        "epsilon": epsilon,
         "eps_a": EPS_A,
         "delta0": DELTA0,
     }

@@ -24,18 +24,22 @@ if __name__ == "__main__":
     with open(OUTPUT_FILE, "r") as f:
         final_params_dict = json.load(f)
         final_params = (
-            [ final_params_dict["alpha"] ]
-            + [ final_params_dict["beta"] ]
-            + [ final_params_dict["gamma"] ]
+            [final_params_dict["alpha"]]
+            + [final_params_dict["beta"]]
+            + [final_params_dict["gamma"]]
+            + final_params_dict["epsilon"]
         )
+
     DELTA0 = final_params_dict["delta0"]
     EPS_A = final_params_dict["eps_a"]
-    factor_mult_epsa = final_params_dict["factor_mult_epsa"]
 
     # Perform the fitting routine to get the parameters.
-    fitting_parameters = FittingParameters(JSON_FILENAME, EPS_A, DELTA0, DEBUG=DEBUG, factor_mult_epsa=factor_mult_epsa)
+    fitting_parameters = FittingParameters(
+        JSON_FILENAME, EPS_A, DELTA0, DEBUG=DEBUG, return_extended_output=True
+    )
     fitting_parameters.load_data()
-    output_data = fitting_parameters.get_comparison_fitting(final_params)
+    mea, output_data = fitting_parameters.objective_function(final_params)
+
     predicted_energy = output_data["predicted_energy"]
     actual_energy = output_data["actual_energy"]
 
@@ -44,7 +48,7 @@ if __name__ == "__main__":
     # Species string
     species = output_data["species_string"]
     logging.info("{}".format(species))
-    
+
     # Data dict for the intermetallic species.
     data = fitting_parameters.data
 

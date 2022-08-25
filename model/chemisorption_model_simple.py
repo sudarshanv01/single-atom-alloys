@@ -35,7 +35,7 @@ class SimpleChemisorption:
         Sak: float,
         Delta0: float,
         eps_a: float,
-        DEBUG: bool, 
+        DEBUG: bool,
     ):
         self.dft_dos = dft_dos
         self.eps = dft_energy_range
@@ -152,7 +152,9 @@ class SimpleChemisorption:
                 # Store the calculation.
                 if self.DEBUG:
                     # Plot the function of the energy_integrand
-                    fig, ax = plt.subplots(1, 1, figsize=(6, 4), constrained_layout=True)
+                    fig, ax = plt.subplots(
+                        1, 1, figsize=(6, 4), constrained_layout=True
+                    )
                     ax.plot(
                         self.eps[ind_below_fermi],
                         arctan_integrand,
@@ -196,7 +198,9 @@ class SimpleChemisorption:
                     ax.set_ylabel("arctan(Integrand)")
                     ax2.set_ylabel("Parameters")
                     ax2.set_ylim([np.min(self.Lambda), np.max(self.Delta)])
-                    logging.warning(f"Plotting the components of the integral to {self.debug_dir}/integrand.png")
+                    logging.warning(
+                        f"Plotting the components of the integral to {self.debug_dir}/integrand.png"
+                    )
                     fig.savefig(os.path.join(self.debug_dir, "integrand.png"), dpi=300)
                     plt.close(fig)
 
@@ -311,14 +315,14 @@ class FittingParameters:
         json_filename: str,
         eps_a_data: List,
         Delta0: float,
-        factor_mult_epsa: List[float] = None,
         DEBUG: bool = False,
+        return_extended_output: bool = False,
     ):
         self.json_filename = json_filename
         self.eps_a_data = eps_a_data
         self.Delta0 = Delta0
         self.DEBUG = DEBUG
-        self.factor_mult_epsa = factor_mult_epsa
+        self.return_extended_output = return_extended_output
 
         self._validate_inputs()
 
@@ -327,14 +331,9 @@ class FittingParameters:
         the right dimensions and type."""
         assert isinstance(self.eps_a_data, list), "eps_a_data must be a list"
         assert isinstance(self.Delta0, float), "Delta0 must be a float"
-        if self.factor_mult_epsa is not None:
-            assert isinstance(self.factor_mult_epsa, list), "factor_mult_epsa must be a list"
 
         # Convert the eps_a_data to a numpy array.
         self.eps_a_data = np.array(self.eps_a_data)
-        # Convert multiple eps_a_data to a numpy array.
-        if self.factor_mult_epsa is not None:
-            self.factor_mult_epsa = np.array(self.factor_mult_epsa)
 
     def load_data(self):
         """Load the data from the json file."""
@@ -342,98 +341,30 @@ class FittingParameters:
             data = json.load(f)
         self.data = data
 
-    def get_comparison_fitting(self, x: Tuple) -> Dict: 
-        """Check the goodness of the fit by returning
-        both the predicted and actual values."""
-
-        # Only one set of parameters are allowed.
-        alpha, beta, gamma = x
-
-        # make sure both alpha and beta are always positive
-        alpha = np.abs(alpha)
-        beta = np.abs(beta)
-
-        # Prepare inputs to the Model class.
-        inputs = defaultdict(lambda: defaultdict(dict))
-        inputs["Delta0"] = self.Delta0
-        inputs["eps_a_data"] = self.eps_a_data
-        inputs["DEBUG"] = self.DEBUG
-
-        # --- Metal specific parameters
-        for _id in self.data:
-            # Parse the relevant quantities from the
-            # supplied dictionary.
-            pdos = self.data[_id]["pdos"]
-            energy_grid = self.data[_id]["energy_grid"]
-            Vsd = self.data[_id]["Vsd"]
-            # Make Vsd an array
-            Vsd = np.array(Vsd)
-
-            # Store the inputs.
-            inputs["dos_data"][_id]["dft_dos"] = pdos
-            inputs["dos_data"][_id]["eps"] = energy_grid
-            inputs["Vak_data"][_id] = self.factor_mult_epsa * np.sqrt(beta) * Vsd
-            inputs["Sak_data"][_id] = - self.factor_mult_epsa * alpha * Vsd
-
-        # Get the outputs
-        model_energies_class = AdsorbateChemisorption(**inputs)
-        model_outputs = model_energies_class.model_outputs
-
-        predicted_energy = []
-        actual_energy = []
-        id_order = []
-        # Store the string of species as well
-        species_string = []
-
-        for _id in model_outputs:
-            # What we will compare against
-            ads_energy_DFT = self.data[_id]["ads_energy"]
-            actual_energy.append(ads_energy_DFT)
-
-            # Construct the model energy
-            model_energy = 0.0
-
-            # Add separately for each eps_a
-            for eps_a in model_outputs[_id]:
-                model_energy += model_outputs[_id][eps_a]["chemi"]
-
-            # Add a constant parameter gamma
-            model_energy += gamma
-            predicted_energy.append(model_energy)
-
-            # Store the _id as well
-            id_order.append(_id)
-
-            # Store the species string
-            spec_string = ''.join(self.data[_id]["species"])
-            species_string.append(spec_string)
-
-        logging.info("Predicted and actual energies parsed.")
-
-        # return predicted_energy, actual_energy, id_order
-        output_data = {}
-        output_data["predicted_energy"] = predicted_energy
-        output_data["actual_energy"] = actual_energy
-        output_data["id_order"] = id_order
-        output_data["species_string"] = species_string
-
-        return output_data
-
     def objective_function(
         self,
         x: Tuple,
     ) -> float:
+
         """Objective function to be minimised."""
 
         # Single set of parameters
-        alpha, beta, gamma = x
+        alpha, beta, gamma, *epsilon = x
 
         # make sure both alpha and beta are always positive
         alpha = np.abs(alpha)
         beta = np.abs(beta)
+        epsilon = np.abs(epsilon)
+
+        # Create a list called factor_mult_list which contains
+        # the factor_mult_epsa for each eps_a value from epsilon
+        factor_mult_list = [1] + [epsilon[i] for i in range(len(epsilon))]
+        factor_mult_list = np.array(factor_mult_list)
 
         # Prepare inputs to the Model class.
         inputs = defaultdict(lambda: defaultdict(dict))
+
+        # Parse common inputs
         inputs["Delta0"] = self.Delta0
         inputs["eps_a_data"] = self.eps_a_data
         inputs["DEBUG"] = self.DEBUG
@@ -450,8 +381,8 @@ class FittingParameters:
             # Store the inputs.
             inputs["dos_data"][_id]["dft_dos"] = pdos
             inputs["dos_data"][_id]["eps"] = energy_grid
-            inputs["Vak_data"][_id] = self.factor_mult_epsa * np.sqrt(beta) * Vsd
-            inputs["Sak_data"][_id] = - self.factor_mult_epsa * alpha * Vsd
+            inputs["Vak_data"][_id] = factor_mult_list * np.sqrt(beta) * Vsd
+            inputs["Sak_data"][_id] = -factor_mult_list * alpha * Vsd
 
         # Get the outputs
         model_energies_class = AdsorbateChemisorption(**inputs)
@@ -483,4 +414,48 @@ class FittingParameters:
             f"Parameters: {x} leads to mean absolute error: {mean_absolute_error}eV"
         )
 
-        return mean_absolute_error
+        if self.return_extended_output:
+
+            predicted_energy = []
+            actual_energy = []
+            id_order = []
+
+            # Store the string of species as well
+            species_string = []
+
+            for _id in model_outputs:
+                # What we will compare against
+                ads_energy_DFT = self.data[_id]["ads_energy"]
+                actual_energy.append(ads_energy_DFT)
+
+                # Construct the model energy
+                model_energy = 0.0
+
+                # Add separately for each eps_a
+                for eps_a in model_outputs[_id]:
+                    model_energy += model_outputs[_id][eps_a]["chemi"]
+
+                # Add a constant parameter gamma
+                model_energy += gamma
+                predicted_energy.append(model_energy)
+
+                # Store the _id as well
+                id_order.append(_id)
+
+                # Store the species string
+                spec_string = "".join(self.data[_id]["species"])
+                species_string.append(spec_string)
+
+            logging.info("Predicted and actual energies parsed.")
+
+            # return predicted_energy, actual_energy, id_order
+            output_data = {}
+            output_data["predicted_energy"] = predicted_energy
+            output_data["actual_energy"] = actual_energy
+            output_data["id_order"] = id_order
+            output_data["species_string"] = species_string
+
+            return mean_absolute_error, output_data
+
+        else:
+            return mean_absolute_error
