@@ -15,16 +15,17 @@ from scipy import signal
 
 import matplotlib.pyplot as plt
 
-from plot_params import get_plot_params
-
-get_plot_params()
-
 
 class SimpleChemisorption:
     """Base class to perform a simple calculation
     to get the chemisorption energy."""
 
     debug_dir = "debug"
+    # Occassionally, during the optimisation process
+    # we will have a situation where the E_hyb is positive
+    # This positive number is numerically caused. Allow
+    # a little bit of noise (but E_hyb) will be set to 0
+    # if the value is greater than 0 and below INTEGRAL_NOISE.
     INTEGRAL_NOISE = 0.3
 
     def __init__(
@@ -35,7 +36,8 @@ class SimpleChemisorption:
         Sak: float,
         Delta0: float,
         eps_a: float,
-        DEBUG: bool,
+        no_of_bonds: int,
+        DEBUG: bool = False,
     ):
         self.dft_dos = dft_dos
         self.eps = dft_energy_range
@@ -43,6 +45,7 @@ class SimpleChemisorption:
         self.Sak = Sak
         self.Delta0 = Delta0
         self.eps_a = eps_a
+        self.no_of_bonds = no_of_bonds
         self.DEBUG = DEBUG
 
         self._validate_inputs()
@@ -92,8 +95,6 @@ class SimpleChemisorption:
     def get_chemisorption_energy(self) -> float:
         """The chemisorption energy is the sum of the
         hybridisation energy and the orthogonalisation energy."""
-        # self.get_hybridisation_energy()
-        # self.get_orthogonalisation_energy()
 
         self.E_chemi = self.E_hyb + self.E_ortho
         logging.debug(
@@ -134,6 +135,9 @@ class SimpleChemisorption:
         E_hyb /= np.pi
 
         E_hyb -= 2 * self.eps_a
+
+        # Multiply by the number of bonds
+        E_hyb *= self.no_of_bonds
 
         self.E_hyb = E_hyb
 
@@ -244,6 +248,8 @@ class SimpleChemisorption:
         self.get_occupancy()
         self.get_filling()
         E_ortho = -2 * (self.n_a + self.filling) * self.Vak * self.Sak
+        # Mutliply by the number of bonds
+        E_ortho *= self.no_of_bonds
         self.E_ortho = E_ortho
         assert self.E_ortho >= 0.0, "Orthogonalisation energy must be positive"
         return self.E_ortho
@@ -256,7 +262,8 @@ class AdsorbateChemisorption(SimpleChemisorption):
     from a DFT calculation.
 
     This class largely wraps around the SimpleChemisorption class
-    to ensure that the lists are dealt with correctly."""
+    to ensure that the lists are dealt with correctly.
+    """
 
     def __init__(
         self,
@@ -265,6 +272,7 @@ class AdsorbateChemisorption(SimpleChemisorption):
         Sak_data: Dict,
         Delta0: float,
         eps_a_data: List,
+        no_of_bonds_list: List[int],
         DEBUG: bool = False,
     ):
 
@@ -288,6 +296,7 @@ class AdsorbateChemisorption(SimpleChemisorption):
                 # Store the float values of Vak and Sak
                 self.Vak = Vak_list[i]
                 self.Sak = Sak_list[i]
+                self.no_of_bonds = no_of_bonds_list[i]
 
                 self._validate_inputs()
 
@@ -308,7 +317,15 @@ class AdsorbateChemisorption(SimpleChemisorption):
 class FittingParameters:
     """Given a json file with the dos and energy stored, and
     some information about epsilon_a values, perform the fitting
-    procedure to determine alpha, beta and a _single_ constant."""
+    procedure to determine alpha, beta and a _single_ constant.
+
+    Args:
+        json_filename (str): The name of the json file containing the dos and energy.
+        eps_a_data (list): The list of epsilon_a values to use.
+        DEBUG (bool): Whether to print debug information.
+        Delta0 (float): The value of Delta0 to use, fixed constant.
+        return_extended_output (bool): Whether to return the extended output.
+    """
 
     def __init__(
         self,
@@ -317,12 +334,14 @@ class FittingParameters:
         Delta0: float,
         DEBUG: bool = False,
         return_extended_output: bool = False,
+        no_of_bonds_list: List[int] = None,
     ):
         self.json_filename = json_filename
         self.eps_a_data = eps_a_data
         self.Delta0 = Delta0
         self.DEBUG = DEBUG
         self.return_extended_output = return_extended_output
+        self.no_of_bonds_list = no_of_bonds_list
 
         self._validate_inputs()
 
@@ -345,8 +364,14 @@ class FittingParameters:
         self,
         x: Tuple,
     ) -> float:
+        """Objective function to be minimised.
 
-        """Objective function to be minimised."""
+        Args:
+            x (Tuple): The parameters to be used in the minimisation.
+                       Include alpha, beta and gamma (fixed constant)
+                       and a list of epsilon values, epsilon is used
+                       to determine the scaling between each of the adsorbates.
+        """
 
         # Single set of parameters
         alpha, beta, gamma, *epsilon = x
@@ -368,6 +393,7 @@ class FittingParameters:
         inputs["Delta0"] = self.Delta0
         inputs["eps_a_data"] = self.eps_a_data
         inputs["DEBUG"] = self.DEBUG
+        inputs["no_of_bonds_list"] = self.no_of_bonds_list
 
         for _id in self.data:
             # Parse the relevant quantities from the
@@ -415,6 +441,7 @@ class FittingParameters:
         )
 
         if self.return_extended_output:
+            # Useful if we want to analyse the fitting parameters.
 
             predicted_energy = []
             actual_energy = []

@@ -32,10 +32,16 @@ if __name__ == "__main__":
 
     DELTA0 = final_params_dict["delta0"]
     EPS_A = final_params_dict["eps_a"]
+    no_of_bonds_list = final_params_dict["no_of_bonds_list"]
 
     # Perform the fitting routine to get the parameters.
     fitting_parameters = FittingParameters(
-        JSON_FILENAME, EPS_A, DELTA0, DEBUG=DEBUG, return_extended_output=True
+        JSON_FILENAME,
+        EPS_A,
+        DELTA0,
+        DEBUG=DEBUG,
+        return_extended_output=True,
+        no_of_bonds_list=no_of_bonds_list,
     )
     fitting_parameters.load_data()
     mea, output_data = fitting_parameters.objective_function(final_params)
@@ -55,8 +61,8 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, 1, figsize=(6, 4), constrained_layout=True)
 
     ax.plot(predicted_energy, actual_energy, "o")
-    ax.set_xlabel("Predicted")
-    ax.set_ylabel("Actual")
+    ax.set_xlabel("Model Predicted (eV)")
+    ax.set_ylabel("DFT (eV)")
     ax.set_title("Model fit")
     ax.set_aspect("equal")
 

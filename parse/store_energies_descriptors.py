@@ -166,7 +166,6 @@ if __name__ == "__main__":
                 energy = np.concatenate((energy_left, energy))
                 pdos_extract = np.concatenate((pdos_left, pdos_extract))
 
-
             # Smear out the projected density of states
             sigma = 0.1  # can change if needed
             diff = [energy[i + 1] - energy[i] for i in range(len(energy) - 1)]

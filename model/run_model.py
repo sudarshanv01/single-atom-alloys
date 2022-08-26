@@ -19,11 +19,14 @@ if __name__ == "__main__":
     OUTPUT_FILE = "outputs/fitting_parameters.json"
     DELTA0 = 0.1  # eV
     EPS_A = [-7, 2.5]  # For CO*
+    no_of_bonds_list = [1, 1]
     DEBUG = True
 
     logging.info("Loading data from {}".format(JSON_FILENAME))
     logging.info("Using Delta0 = {} eV".format(DELTA0))
     logging.info("Using eps_a = {} eV".format(EPS_A))
+    logging.info("Using No. of bonds = {}".format(no_of_bonds_list))
+
     if DEBUG:
         logging.info("Running in DEBUG mode.")
 
@@ -33,9 +36,10 @@ if __name__ == "__main__":
             with open(OUTPUT_FILE, "r") as f:
                 initial_guess_dict = json.load(f)
                 initial_guess = (
-                    initial_guess_dict["alpha"]
-                    + initial_guess_dict["beta"]
+                    [initial_guess_dict["alpha"]]
+                    + [initial_guess_dict["beta"]]
                     + [initial_guess_dict["gamma"]]
+                    + initial_guess_dict["epsilon"]
                 )
         else:
             raise ValueError("Invalid argument. Only `restart` is allowed.")
@@ -49,6 +53,7 @@ if __name__ == "__main__":
         EPS_A,
         DELTA0,
         DEBUG=DEBUG,
+        no_of_bonds_list=no_of_bonds_list,
     )
     fitting_parameters.load_data()
     parameters = scipy.optimize.fmin(
@@ -70,6 +75,7 @@ if __name__ == "__main__":
         "epsilon": epsilon,
         "eps_a": EPS_A,
         "delta0": DELTA0,
+        "no_of_bonds_list": no_of_bonds_list,
     }
 
     with open(OUTPUT_FILE, "w") as handle:
