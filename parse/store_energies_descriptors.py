@@ -93,6 +93,7 @@ if __name__ == "__main__":
 
             # Get the slab id
             _id = dict_data[mp_id]["slabs"][0]["id"]
+            _id_co = dict_data[mp_id]["adsorption"][0]["id"]
 
             # Get the adsorption site
             ads_site = dict_data[mp_id]["adsorption"][0]["ads_site"]
@@ -105,10 +106,22 @@ if __name__ == "__main__":
             vr = Vasprun(
                 os.path.join(vaspruns_path, type_calc, "slab", _id + "_vasprun.xml.gz")
             )
+            vr_co = Vasprun(
+                os.path.join(
+                    vaspruns_path, type_calc, "ads_slab", _id_co + "_vasprun.xml.gz"
+                )
+            )
 
             # Store the dos
             dos = vr.complete_dos
             structure = dos.structure
+            dos_co = vr_co.complete_dos
+            structure_co = dos_co.structure
+
+            # Get the distance between the C atom in CO and the adsorption site
+            carbon_index = structure_co.indices_from_symbol("C")[0]
+            bond_length_co = structure_co.get_distance(carbon_index, ads_site)
+            logging.info(f"Bond length: {bond_length_co} Angstrom")
 
             # Write out the structures
             structure.to(filename=f"outputs/{type_calc}/{mp_id}_structure.cif")
@@ -151,6 +164,13 @@ if __name__ == "__main__":
             # Extract the energies from the projected density of states
             # and reference to the Fermi level
             energy = pdos.energies - pdos.efermi
+            # Extract also the pdos for the CO
+            pdos_co = dos_co.get_site_spd_dos(structure_co[carbon_index])[OrbitalType.s]
+            pdos_extract_co = pdos_co.get_densities()
+            pdos_extract_co = np.array(pdos_extract_co)
+            pdos_co = dos_co.get_site_spd_dos(structure_co[carbon_index])[OrbitalType.p]
+            pdos_extract_co += pdos_co.get_densities()
+            energy_co = pdos_co.energies - pdos_co.efermi
 
             # If the lowest energy is higher than -20, pad
             # the pdos array with zeros and the energy arrays
@@ -171,10 +191,18 @@ if __name__ == "__main__":
             diff = [energy[i + 1] - energy[i] for i in range(len(energy) - 1)]
             avgdiff = sum(diff) / len(diff)
             pdos_extract = gaussian_filter1d(pdos_extract, sigma / avgdiff)
+            # Do the same smearing for CO
+            diff_co = [
+                energy_co[i + 1] - energy_co[i] for i in range(len(energy_co) - 1)
+            ]
+            avgdiff_co = sum(diff_co) / len(diff_co)
+            pdos_extract_co = gaussian_filter1d(pdos_extract_co, sigma / avgdiff_co)
 
             # Normalise the extracted pdos
             normalising_integral = np.trapz(pdos_extract, energy)
             pdos_extract /= normalising_integral
+            normalising_integral_co = np.trapz(pdos_extract_co, energy_co)
+            pdos_extract_co /= normalising_integral_co
 
             # Get the band centres and widths
             center_ase, width_ase = get_distribution_moment(
@@ -188,7 +216,9 @@ if __name__ == "__main__":
             # Plot the band centre and width as
             ax.plot(pdos_extract, energy, "-", color="k")
             ax.plot(pdos_extract, energy, ".", color="k", alpha=0.1)
+            ax.plot(pdos_extract_co, energy_co, "-", color="tab:blue")
             ax.fill_between(pdos_extract, 0, energy, color="k", alpha=0.2)
+            ax.fill_between(pdos_extract_co, 0, energy_co, color="tab:blue", alpha=0.2)
             ax.axhline(center_ase, color="tab:red", linestyle="--")
             ax.axhline(center_ase + width_ase, color="tab:blue", linestyle="--")
             ax.axhline(center_ase - width_ase, color="tab:blue", linestyle="--")
