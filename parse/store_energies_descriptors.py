@@ -63,7 +63,7 @@ def create_coupling_elements(
 if __name__ == "__main__":
     """Store the energies and the d-band centres in a json file."""
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, filename="parser.log")
 
     # Path to the vasprun folder
     vaspruns_path = "vaspruns"
