@@ -48,10 +48,12 @@ if __name__ == "__main__":
     figc, axc = plt.subplots(dim_x, dim_y, figsize=(6, 3.5), constrained_layout=True)
     figo, axo = plt.subplots(dim_x, dim_y, figsize=(6, 3.5), constrained_layout=True)
     figh, axh = plt.subplots(dim_x, dim_y, figsize=(6, 3.5), constrained_layout=True)
+    figoc, axoc = plt.subplots(dim_x, dim_y, figsize=(6, 3.5), constrained_layout=True)
 
     figc.suptitle("$E_{\mathrm{chemisorption}}$ (eV)")
     figo.suptitle("$E_{\mathrm{orthogonalisation}}$ (eV)")
     figh.suptitle("$E_{\mathrm{hybridisation}}$ (eV)")
+    figoc.suptitle("$n_a$ (e)")
 
     GRID_SIZE = 25
     eps_d_list = np.linspace(-5, 4, GRID_SIZE)
@@ -72,7 +74,7 @@ if __name__ == "__main__":
         energy_components = method.generate_meshgrid()
 
         # Plot the energy components as contourf plots.
-        e_hyb, e_ortho, e_chem = energy_components
+        e_hyb, e_ortho, e_chem, occupancy = energy_components
 
         # Get the index of the plot
         index_x, index_y = index_m % 2, index_m // 2
@@ -81,16 +83,21 @@ if __name__ == "__main__":
         caxo = axo[index_x, index_y].contourf(
             eps_d_list, w_d_list, e_ortho, cmap="RdBu"
         )
+        caxoc = axoc[index_x, index_y].contourf(
+            eps_d_list, w_d_list, occupancy, cmap="RdBu"
+        )
 
         # Make the metal the title of the plot
         axh[index_x, index_y].set_title(metal)
         axc[index_x, index_y].set_title(metal)
         axo[index_x, index_y].set_title(metal)
+        axoc[index_x, index_y].set_title(metal)
 
         # Add the colorbar to the plot
         figh.colorbar(caxh, ax=axh[index_x, index_y])
         figh.colorbar(caxc, ax=axc[index_x, index_y])
         figh.colorbar(caxo, ax=axo[index_x, index_y])
+        figoc.colorbar(caxoc, ax=axoc[index_x, index_y])
 
     # Plot the points that Andrew computed on the same plots
     for type_material in ["intermetallics", "elementals"]:
@@ -109,18 +116,22 @@ if __name__ == "__main__":
                 "d_band_centre"
             ]
 
-            for ax in [axc, axo, axh]:
+            for ax in [axc, axo, axh, axoc]:
                 ax[index_x, index_y].plot(
                     d_band_centre, width, marker, color=color, markersize=3
                 )
+                ax[index_x, index_y].set_xlabel("$\epsilon_d$ (eV)")
+                ax[index_x, index_y].set_ylabel("$w_d$ (eV)")
 
     # Delete the last unused subplot
     if len(METALS) % 2 == 1:
         figc.delaxes(axc[-1, -1])
         figo.delaxes(axo[-1, -1])
         figh.delaxes(axh[-1, -1])
+        figoc.delaxes(axoc[-1, -1])
 
     # Save the plots
     figc.savefig("plots/energy_components_chemisorption.png", dpi=300)
     figo.savefig("plots/energy_components_ortho.png", dpi=300)
     figh.savefig("plots/energy_components_hyb.png", dpi=300)
+    figoc.savefig("plots/occupancy.png", dpi=300)

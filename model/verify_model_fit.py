@@ -3,6 +3,7 @@ import logging
 import json
 
 import numpy as np
+import scipy
 
 import matplotlib.pyplot as plt
 
@@ -48,6 +49,11 @@ if __name__ == "__main__":
 
     predicted_energy = output_data["predicted_energy"]
     actual_energy = output_data["actual_energy"]
+
+    # Determine the R^2 value of the fit.
+    slope, intercept, r, p, se = scipy.stats.linregress(actual_energy, predicted_energy)
+    r_squared = r**2
+    logging.info(f"R^2 value: {r_squared}")
 
     # Get the id numbers of energies
     id_numbers = output_data["id_order"]

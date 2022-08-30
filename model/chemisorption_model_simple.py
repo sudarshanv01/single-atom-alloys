@@ -317,6 +317,7 @@ class SemiEllipseHypothetical(SimpleChemisorption):
         self.hyb_energy_meshgrid = np.zeros((self.GRID_SIZE, self.GRID_SIZE))
         self.chem_energy_meshgrid = np.zeros((self.GRID_SIZE, self.GRID_SIZE))
         self.ortho_energy_meshgrid = np.zeros((self.GRID_SIZE, self.GRID_SIZE))
+        self.occupancy_meshgrid = np.zeros((self.GRID_SIZE, self.GRID_SIZE))
 
         for index_epsd, eps_d in enumerate(self.eps_d_list):
             for index_wd, w_d in enumerate(self.w_d_list):
@@ -344,19 +345,26 @@ class SemiEllipseHypothetical(SimpleChemisorption):
                     # Get the chemisorption and hybridisation energies.
                     self.hyb_energy_meshgrid[
                         index_epsd, index_wd
-                    ] = self.get_hybridisation_energy()
+                    ] += self.get_hybridisation_energy()
                     self.ortho_energy_meshgrid[
                         index_epsd, index_wd
-                    ] = self.get_orthogonalisation_energy()
+                    ] += self.get_orthogonalisation_energy()
                     self.chem_energy_meshgrid[
                         index_epsd, index_wd
-                    ] = self.get_chemisorption_energy()
+                    ] += self.get_chemisorption_energy()
+
+                    # Store also the occupancies
+                    self.occupancy_meshgrid[
+                        index_epsd, index_wd
+                    ] += self.get_occupancy()
+
         # Add gamma to the chemisorption energy.
         self.chem_energy_meshgrid += self.gamma
         return (
             self.hyb_energy_meshgrid,
             self.ortho_energy_meshgrid,
             self.chem_energy_meshgrid,
+            self.occupancy_meshgrid,
         )
 
 
