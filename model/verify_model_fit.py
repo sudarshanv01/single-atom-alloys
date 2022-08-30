@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     # Annotate the plot with species information
     for i, spec in enumerate(species):
-        ax.annotate(spec, xy=(predicted_energy[i], actual_energy[i]))
+        ax.annotate(spec, xy=(predicted_energy[i], actual_energy[i]), fontsize=6)
 
     # Plot parity plot
     x_par = np.linspace(min(predicted_energy), max(predicted_energy), 100)

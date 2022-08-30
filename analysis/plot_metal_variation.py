@@ -56,7 +56,7 @@ if __name__ == "__main__":
     GRID_SIZE = 25
     eps_d_list = np.linspace(-5, 4, GRID_SIZE)
     w_d_list = np.linspace(0.1, 5, GRID_SIZE)
-    eps = np.linspace(-20, 20, 1000)
+    eps = np.linspace(-20, 20, 10000)
 
     for index_m, metal in enumerate(METALS):
         Vsd = vsd_data[metal]
