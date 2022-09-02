@@ -360,6 +360,8 @@ class SemiEllipseHypothetical(SimpleChemisorption):
 
         # Add gamma to the chemisorption energy.
         self.chem_energy_meshgrid += self.gamma
+        self.hyb_energy_meshgrid += self.gamma
+
         return (
             self.hyb_energy_meshgrid,
             self.ortho_energy_meshgrid,

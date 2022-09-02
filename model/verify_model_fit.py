@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 
 from chemisorption_model_simple import FittingParameters
 
+from plot_params import get_plot_params_andrew
+
+get_plot_params_andrew()
+
 if __name__ == "__main__":
     """Plot the model energies against the DFT
     chemisorption energies to see if the model fit
@@ -66,18 +70,25 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots(1, 1, figsize=(6, 4), constrained_layout=True)
 
-    ax.plot(predicted_energy, actual_energy, "o")
+    ax.plot(predicted_energy, actual_energy, "o", color="tab:pink", markeredgecolor="k")
     ax.set_xlabel("Model Predicted (eV)")
     ax.set_ylabel("DFT (eV)")
-    ax.set_title("Model fit")
+    ax.set_title("Model Fit")
+
+    # Make x and y limits the same
+    ax.set_ylim([-2.0, 0])
+    ax.set_xlim(ax.get_ylim())
+    # Set the same x-ticks
+    ax.set_xticks(ax.get_yticks())
+
     ax.set_aspect("equal")
 
     # Annotate the plot with species information
-    for i, spec in enumerate(species):
-        ax.annotate(spec, xy=(predicted_energy[i], actual_energy[i]), fontsize=6)
+    # for i, spec in enumerate(species):
+    #     ax.annotate(spec, xy=(predicted_energy[i], actual_energy[i]), fontsize=6)
 
     # Plot parity plot
-    x_par = np.linspace(min(predicted_energy), max(predicted_energy), 100)
+    x_par = np.linspace(-2.1, 0.1, 100)
     y_par = x_par
     ax.plot(x_par, y_par, "k-")
     fig.savefig("outputs/model_fit.png", dpi=300)

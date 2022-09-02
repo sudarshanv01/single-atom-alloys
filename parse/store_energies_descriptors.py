@@ -226,9 +226,9 @@ if __name__ == "__main__":
                 ax.fill_between(
                     pdos_extract_co, 0, energy_co, color="tab:blue", alpha=0.2
                 )
-                ax.axhline(center_ase, color="tab:red", linestyle="--")
-                ax.axhline(center_ase + width_ase, color="tab:blue", linestyle="--")
-                ax.axhline(center_ase - width_ase, color="tab:blue", linestyle="--")
+                ax.axhline(centre, color="tab:red", linestyle="--")
+                ax.axhline(centre + width, color="tab:blue", linestyle="--")
+                ax.axhline(centre - width, color="tab:blue", linestyle="--")
 
                 # Generate output_data
                 output_data[_id]["d_band_centre"] = centre

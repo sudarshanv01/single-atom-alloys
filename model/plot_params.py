@@ -32,6 +32,26 @@ def get_plot_params():
     plt.rcParams["ytick.color"] = COLOR
 
 
+def get_plot_params_andrew():
+
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+    from matplotlib import rc
+
+    plt.rcParams["text.usetex"] = True
+    plt.rcParams["figure.dpi"] = 150
+    plt.rcParams["figure.figsize"] = 3.5, 3.5
+    plt.rcParams["savefig.dpi"] = 600
+    plt.rcParams["xtick.labelsize"] = 8
+    plt.rcParams["ytick.labelsize"] = 8
+    plt.rcParams["axes.labelsize"] = 10
+    plt.rcParams["axes.titlesize"] = 10
+    plt.rcParams["legend.fontsize"] = 10
+    plt.rcParams["legend.title_fontsize"] = 10
+    plt.rcParams["xtick.minor.visible"] = True
+    plt.rcParams["ytick.minor.visible"] = True
+
+
 def get_plot_params_Times():
     """Create the plot parameters used in the plotting
     all the figures in the paper
