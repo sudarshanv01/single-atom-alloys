@@ -4,3 +4,4 @@ matplotlib
 ase
 pymatgen
 pre-commit
+monty

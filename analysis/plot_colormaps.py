@@ -175,7 +175,7 @@ if __name__ == "__main__":
         axh[-1, -1].axis("off")
     # Plot the legend to show the difference between contour
     # and contourf plots
-    axo[-1, -1].plot([], [], "k", alpha=0.5, linewidth=0.75, label="$E_{\mathrm{hyb}}$")
+    axo[-1, -1].plot([], [], "k", alpha=0.5, linewidth=0.75, ls='--', label="$E_{\mathrm{hyb}}$")
     # Set for the points in the last plot
     axo[-1, -1].legend(loc="upper center", frameon=False)
     axc[-1, -1].legend(loc="upper center", frameon=False)
