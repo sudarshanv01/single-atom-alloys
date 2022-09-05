@@ -1,0 +1,7 @@
+numpy
+scipy
+matplotlib
+ase
+pymatgen
+pre-commit
+monty
