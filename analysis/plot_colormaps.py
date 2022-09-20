@@ -6,6 +6,7 @@ import numpy as np
 from monty.serialization import loadfn, dumpfn
 
 import matplotlib.pyplot as plt
+plt.rcParams['contour.negative_linestyle'] = 'solid'
 
 from plot_params import get_plot_params_andrew
 
@@ -86,7 +87,7 @@ if __name__ == "__main__":
             colors="k",
             linewidths=0.75,
         )
-        axo[index_x, index_y].clabel(caxoc, inline=True, fontsize=5)
+        axo[index_x, index_y].clabel(caxoc, inline=True, fontsize=7)
         axhp[index_x, index_y].contourf(
             w_d_list,
             eps_d_list,
