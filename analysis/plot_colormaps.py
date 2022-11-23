@@ -6,7 +6,8 @@ import numpy as np
 from monty.serialization import loadfn, dumpfn
 
 import matplotlib.pyplot as plt
-plt.rcParams['contour.negative_linestyle'] = 'solid'
+
+plt.rcParams["contour.negative_linestyle"] = "solid"
 
 from plot_params import get_plot_params_andrew
 
@@ -176,7 +177,7 @@ if __name__ == "__main__":
         axh[-1, -1].axis("off")
     # Plot the legend to show the difference between contour
     # and contourf plots
-    axo[-1, -1].plot([], [], "k", linewidth=0.75, ls="--", label="$E_{\mathrm{hyb}}$")
+    axo[-1, -1].plot([], [], "k", linewidth=0.75, ls="-", label="$E_{\mathrm{hyb}}$")
     # Set for the points in the last plot
     axo[-1, -1].legend(loc="upper center", frameon=False)
     axc[-1, -1].legend(loc="upper center", frameon=False)
