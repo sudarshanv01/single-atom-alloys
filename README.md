@@ -1,6 +1,8 @@
 `single-atom-alloys`
 -------------------
 
+[![DOI](https://zenodo.org/badge/519363038.svg)](https://zenodo.org/badge/latestdoi/519363038)
+
 
 This repository serves as a complement to the paper "Free-atom-like d-states Beyond the Dilute Limit of Single-Atom Alloys" [link](https://chemrxiv.org/engage/chemrxiv/article-details/63312eadba8a6d2f525d30b7).
 
